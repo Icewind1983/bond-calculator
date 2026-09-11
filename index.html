@@ -120,21 +120,6 @@
             transform: translateY(0);
         }
 
-        .input-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .input-group-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group-item input {
-            margin: 0;
-        }
-
         .results-section {
             grid-column: 1 / -1;
         }
@@ -155,6 +140,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.9em;
         }
 
         th {
@@ -313,11 +299,11 @@
                         <thead>
                             <tr>
                                 <th>Дата выплаты</th>
-                                <th>Количество облигаций</th>
-                                <th>Купонный доход (до налога)</th>
+                                <th>Кол-во облигаций</th>
+                                <th>Купон (до налога)</th>
                                 <th>НДФЛ</th>
-                                <th>Купонный доход (после налога)</th>
-                                <th>Цена покупки облигации</th>
+                                <th>Купон (после налога)</th>
+                                <th>Цена покупки</th>
                                 <th>Куплено облигаций</th>
                             </tr>
                         </thead>
@@ -354,15 +340,201 @@
                         <div class="info-text">Потрачено денег</div>
                     </div>
                     <div class="summary-card">
-                        <h3>Доход на инвестицию</h3>
-                        <div class="value" id="roi">—</div>
-                        <div class="info-text">Финальная цена реализации</div>
+                        <h3>Финальная стоимость</h3>
+                        <div class="value" id="finalValue">—</div>
+                        <div class="info-text">При погашении облигаций</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="calculator.js"></script>
+    <script>
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency',
+                currency: 'RUB',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('ru-RU', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        function calculateBonds() {
+            try {
+                console.log("Начало расчета...");
+                
+                // Получаем все значения из формы
+                const nominal = parseFloat(document.getElementById('nominal').value);
+                const couponSize = parseFloat(document.getElementById('couponSize').value);
+                const couponPeriod = parseInt(document.getElementById('couponPeriod').value);
+                const taxRate = parseFloat(document.getElementById('taxRate').value) / 100;
+                const purchasePricePercent = parseFloat(document.getElementById('purchasePrice').value) / 100;
+                const initialInvestment = parseFloat(document.getElementById('initialInvestment').value);
+                
+                const couponDateStr = document.getElementById('couponDate').value;
+                const maturityDateStr = document.getElementById('maturityDate').value;
+                const purchaseDateStr = document.getElementById('purchaseDate').value;
+
+                console.log("Номинал:", nominal);
+                console.log("Купон:", couponSize);
+                console.log("Период:", couponPeriod);
+                console.log("Налог:", taxRate);
+                console.log("Процент цены:", purchasePricePercent);
+                console.log("Начальная инвестиция:", initialInvestment);
+
+                // Парсим даты корректно
+                const couponDate = new Date(couponDateStr + 'T00:00:00Z');
+                const maturityDate = new Date(maturityDateStr + 'T00:00:00Z');
+                const purchaseDate = new Date(purchaseDateStr + 'T00:00:00Z');
+
+                console.log("Дата первого купона:", couponDate);
+                console.log("Дата погашения:", maturityDate);
+                console.log("Дата покупки:", purchaseDate);
+
+                // Валидация данных
+                if (!nominal || !couponSize || !couponPeriod || purchasePricePercent <= 0 || initialInvestment <= 0) {
+                    throw new Error('Пожалуйста, заполните все поля корректно');
+                }
+
+                if (isNaN(couponDate.getTime()) || isNaN(maturityDate.getTime()) || isNaN(purchaseDate.getTime())) {
+                    throw new Error('Пожалуйста, проверьте корректность дат');
+                }
+
+                // Начальный расчет
+                const priceInRubles = nominal * purchasePricePercent; // Цена в рублях
+                const initialBonds = Math.floor(initialInvestment / priceInRubles); // Колич��ство облигаций
+
+                console.log("Цена облигации в рублях:", priceInRubles);
+                console.log("Купленных облигаций:", initialBonds);
+
+                // Массив для хранения результатов
+                const results = [];
+                let currentBonds = initialBonds;
+                let totalCouponIncomeAfterTax = 0;
+                let cumulativeInvested = initialInvestment;
+
+                // Генерируем даты выплат купонов, начиная с первой выплаты
+                let currentDate = new Date(couponDate);
+                let paymentNumber = 0;
+                
+                while (currentDate <= maturityDate) {
+                    console.log("Проверка даты:", formatDate(currentDate), "vs покупка:", formatDate(purchaseDate));
+                    
+                    // Выплата считается, если она происходит в день покупки или позже
+                    if (currentDate >= purchaseDate) {
+                        const couponBeforeTax = currentBonds * couponSize;
+                        const tax = couponBeforeTax * taxRate;
+                        const couponAfterTax = couponBeforeTax - tax;
+                        
+                        // Капитализация - покупаем новые облигации на полученный купонный доход
+                        const bondsPurchased = Math.floor(couponAfterTax / priceInRubles);
+                        const remainingCash = couponAfterTax - (bondsPurchased * priceInRubles);
+                        
+                        results.push({
+                            date: new Date(currentDate),
+                            bondsBeforePayment: currentBonds,
+                            couponBeforeTax: couponBeforeTax,
+                            tax: tax,
+                            couponAfterTax: couponAfterTax,
+                            purchasePrice: priceInRubles,
+                            bondsPurchased: bondsPurchased,
+                            remainingCash: remainingCash
+                        });
+
+                        console.log("Добавлена выплата:", formatDate(currentDate), "Облигаций:", currentBonds, "Новых облигаций:", bondsPurchased);
+
+                        currentBonds += bondsPurchased;
+                        totalCouponIncomeAfterTax += couponAfterTax;
+                        cumulativeInvested += couponAfterTax;
+                    }
+
+                    // Переходим к следующей дате выплаты
+                    paymentNumber++;
+                    currentDate = new Date(couponDate.getTime() + paymentNumber * couponPeriod * 24 * 60 * 60 * 1000);
+                }
+
+                console.log("Всего выплат:", results.length);
+
+                // Если нет результатов, возвращаем ошибку
+                if (results.length === 0) {
+                    throw new Error('Нет выплат купонов между датой покупки и датой погашения. Пожалуйста, проверьте даты.');
+                }
+
+                // Расчет прибыли при погашении
+                const maturityValue = currentBonds * nominal; // Полная стоимость облигаций при погашении
+                const capitalGain = maturityValue - cumulativeInvested;
+                const capitalGainTax = Math.max(0, capitalGain * taxRate); // Налог на прибыль от переоценки
+                const capitalGainAfterTax = capitalGain - capitalGainTax;
+
+                // Общий доход
+                const totalIncome = totalCouponIncomeAfterTax + capitalGainAfterTax;
+
+                console.log("Финальных облигаций:", currentBonds);
+                console.log("Доход от купонов:", totalCouponIncomeAfterTax);
+                console.log("Прибыль от переоценки:", capitalGainAfterTax);
+                console.log("Общий доход:", totalIncome);
+
+                // Отображение результатов
+                displayResults(results, currentBonds, totalCouponIncomeAfterTax, capitalGainAfterTax, 
+                              totalIncome, cumulativeInvested, maturityValue, capitalGain, capitalGainTax);
+
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('errorMessage').style.display = 'none';
+
+            } catch (error) {
+                console.error("Ошибка:", error);
+                const errorEl = document.getElementById('errorMessage');
+                errorEl.textContent = '❌ Ошибка: ' + error.message;
+                errorEl.style.display = 'block';
+                document.getElementById('resultsSection').style.display = 'none';
+            }
+        }
+
+        function displayResults(results, finalBonds, totalCouponIncome, capitalGainAfterTax, 
+                               totalIncome, totalInvested, maturityValue, capitalGain, capitalGainTax) {
+            // Очищаем таблицу
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            // Заполняем таблицу результатами
+            results.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(row.date)}</td>
+                    <td>${formatNumber(row.bondsBeforePayment)}</td>
+                    <td>${formatCurrency(row.couponBeforeTax)}</td>
+                    <td>${formatCurrency(row.tax)}</td>
+                    <td>${formatCurrency(row.couponAfterTax)}</td>
+                    <td>${formatCurrency(row.purchasePrice)}</td>
+                    <td>${formatNumber(row.bondsPurchased)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Обновляем сводку
+            document.getElementById('finalBonds').textContent = formatNumber(finalBonds);
+            document.getElementById('totalCouponIncome').textContent = formatCurrency(totalCouponIncome);
+            document.getElementById('revaluationProfit').textContent = formatCurrency(capitalGainAfterTax);
+            document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('totalInvestment').textContent = formatCurrency(totalInvested);
+            document.getElementById('finalValue').textContent = formatCurrency(maturityValue);
+
+            // Показываем сообщение об успехе
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = `✅ Расчет выполнен успешно! Всего выплат купонов: ${results.length}`;
+            successEl.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
