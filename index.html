@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -73,7 +73,7 @@
         .section h2 {
             color: #333;
             margin-bottom: 20px;
-            font-size: 1.2em;
+            font-size: 1.1em;
         }
 
         .form-group {
@@ -82,7 +82,7 @@
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             color: #555;
             font-weight: 500;
             font-size: 0.9em;
@@ -93,7 +93,7 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 0.95em;
+            font-size: 0.9em;
             transition: border-color 0.3s;
         }
 
@@ -143,7 +143,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85em;
+            font-size: 0.8em;
         }
 
         th {
@@ -215,7 +215,7 @@
         }
 
         .info-text {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: #999;
             margin-top: 3px;
             font-style: italic;
@@ -225,17 +225,29 @@
             margin: 10px 0;
             border-top: 1px solid #e0e0e0;
         }
+
+        .amort-row {
+            background: #fff3e0 !important;
+        }
+
+        .coupon-row {
+            background: #e8f5e9 !important;
+        }
+
+        .both-row {
+            background: #f3e5f5 !important;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>📊 Калькулятор Облигаций Pro</h1>
-            <p>Расчет с капитализацией, ежемесячной покупкой и амортизацией</p>
+            <p>Расчет с капитализацией, ежемесячной покупкой и квартальной амортизацией</p>
         </div>
 
         <div class="content">
-            <!-- Исходные данные облигации -->
+            <!-- Параметры облигации -->
             <div class="section">
                 <h2>📋 Параметры Облигации</h2>
                 
@@ -302,48 +314,34 @@
                     <input type="number" id="monthlyPurchase" value="12000" step="0.01" min="0">
                     <div class="info-text">В дату выплаты купона</div>
                 </div>
-
-                <div class="form-group">
-                    <label for="amortizationStart">Начало амортизации (периодов)</label>
-                    <input type="number" id="amortizationStart" value="8" step="1" min="1">
-                    <div class="info-text">За N периодов до погашения</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="amortizationRate">Амортизация (% номинала)</label>
-                    <input type="number" id="amortizationRate" value="12.5" step="0.01" min="0" max="100">
-                    <div class="info-text">От номинала за период</div>
-                </div>
             </div>
 
-            <!-- Результаты по счетам -->
+            <!-- Параметры амортизации -->
             <div class="section">
-                <h2>📊 Итоги Расчета</h2>
-                <div id="summaryStats" style="font-size: 0.9em;">
-                    <div style="margin-bottom: 10px;">
-                        <strong>Облигаций на погашение:</strong><br>
-                        <span id="finalBonds" style="font-size: 1.4em; color: #667eea; font-weight: bold;">—</span>
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <strong>Купонный доход (после налога):</strong><br>
-                        <span id="totalCouponIncome" style="font-size: 1.3em; color: #388e3c; font-weight: bold;">—</span>
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <strong>Прибыль переоценки (после налога):</strong><br>
-                        <span id="revaluationProfit" style="font-size: 1.3em; color: #1976d2; font-weight: bold;">—</span>
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <strong>Итоговый доход:</strong><br>
-                        <span id="totalIncome" style="font-size: 1.4em; color: #d32f2f; font-weight: bold;">—</span>
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <strong>Всего инвестировано:</strong><br>
-                        <span id="totalInvestment" style="font-size: 1.2em; color: #666;">—</span>
-                    </div>
-                    <div>
-                        <strong>Финальная стоимость:</strong><br>
-                        <span id="finalValue" style="font-size: 1.2em; color: #666;">—</span>
-                    </div>
+                <h2>📉 Амортизация</h2>
+
+                <div class="form-group">
+                    <label for="amortizationStartDate">Дата начала амортизации</label>
+                    <input type="date" id="amortizationStartDate" value="2026-05-24">
+                    <div class="info-text">Первый платеж амортизации</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="amortizationPeriod">Периодичность амортизации (дней)</label>
+                    <input type="number" id="amortizationPeriod" value="91" step="1" min="1">
+                    <div class="info-text">Кварталы (91 день)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="amortizationQuarters">Кол-во кварталов до погашения</label>
+                    <input type="number" id="amortizationQuarters" value="8" step="1" min="1">
+                    <div class="info-text">Начало за N кварталов</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="amortizationRate">Амортизация (% номинала/период)</label>
+                    <input type="number" id="amortizationRate" value="12.5" step="0.01" min="0" max="100">
+                    <div class="info-text">От номинала за период</div>
                 </div>
 
                 <button onclick="calculateBonds()">🧮 Рассчитать</button>
@@ -354,7 +352,39 @@
                 <div class="error" id="errorMessage"></div>
                 <div class="success" id="successMessage"></div>
 
-                <h2>📈 График выплат и закупок</h2>
+                <h2>📊 Итоги Расчета</h2>
+                <div class="summary">
+                    <div class="summary-card">
+                        <h3>Облигаций на погашение</h3>
+                        <div class="value" id="finalBonds">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Купонный доход (после налога)</h3>
+                        <div class="value" id="totalCouponIncome" style="color: #388e3c;">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Амортизация (сумма)</h3>
+                        <div class="value" id="totalAmortization" style="color: #ff9800;">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Прибыль переоценки</h3>
+                        <div class="value" id="revaluationProfit" style="color: #1976d2;">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Итоговый доход</h3>
+                        <div class="value" id="totalIncome" style="color: #d32f2f;">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Всего инвестировано</h3>
+                        <div class="value" id="totalInvestment" style="color: #666;">—</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Финальная стоимость</h3>
+                        <div class="value" id="finalValue" style="color: #666;">—</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 30px;">📈 График выплат и амортизации</h2>
                 <div class="table-wrapper">
                     <table id="resultsTable">
                         <thead>
@@ -362,11 +392,11 @@
                                 <th>Дата</th>
                                 <th>Облигаций<br>(начало)</th>
                                 <th>Купон<br>(до налога)</th>
-                                <th>НДФЛ<br>на купон</th>
+                                <th>НДФЛ</th>
                                 <th>Купон<br>(после налога)</th>
                                 <th>Ежемесячная<br>покупка</th>
                                 <th>Амортизация</th>
-                                <th>Итого<br>расходы</th>
+                                <th>Итого<br>на покупку</th>
                                 <th>Цена<br>облигации</th>
                                 <th>Куплено<br>облигаций</th>
                             </tr>
@@ -400,6 +430,18 @@
             return date.toLocaleDateString('ru-RU');
         }
 
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        function datesEqual(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+
         function calculateBonds() {
             try {
                 // Получаем все значения из формы
@@ -410,19 +452,22 @@
                 const purchasePricePercent = parseFloat(document.getElementById('purchasePrice').value) / 100;
                 const initialInvestment = parseFloat(document.getElementById('initialInvestment').value);
                 const monthlyPurchase = parseFloat(document.getElementById('monthlyPurchase').value);
-                const amortizationStart = parseInt(document.getElementById('amortizationStart').value);
                 const amortizationRate = parseFloat(document.getElementById('amortizationRate').value) / 100;
+                const amortizationPeriod = parseInt(document.getElementById('amortizationPeriod').value);
+                const amortizationQuarters = parseInt(document.getElementById('amortizationQuarters').value);
                 
                 const couponDateStr = document.getElementById('couponDate').value;
                 const maturityDateStr = document.getElementById('maturityDate').value;
                 const purchaseDateStr = document.getElementById('purchaseDate').value;
+                const amortizationStartDateStr = document.getElementById('amortizationStartDate').value;
 
-                // Парсим даты корректно
+                // Парсим даты
                 const couponDate = new Date(couponDateStr + 'T00:00:00Z');
                 const maturityDate = new Date(maturityDateStr + 'T00:00:00Z');
                 const purchaseDate = new Date(purchaseDateStr + 'T00:00:00Z');
+                const amortizationStartDate = new Date(amortizationStartDateStr + 'T00:00:00Z');
 
-                // Валидация данных
+                // Валидация
                 if (!nominal || !couponSize || !couponPeriod || purchasePricePercent <= 0 || initialInvestment <= 0) {
                     throw new Error('Пожалуйста, заполните все поля корректно');
                 }
@@ -431,7 +476,10 @@
                     throw new Error('Пожалуйста, проверьте корректность дат');
                 }
 
-                // Начальный расчет
+                // Расчет даты начала амортизации на основе кварталов
+                // Начало амортизации - 8 кварталов (8 * 91 дней) до погашения
+                const actualAmortizationStartDate = addDays(maturityDate, -amortizationQuarters * amortizationPeriod);
+
                 const priceInRubles = nominal * purchasePricePercent;
                 const initialBonds = Math.floor(initialInvestment / priceInRubles);
 
@@ -439,40 +487,80 @@
                 const results = [];
                 let currentBonds = initialBonds;
                 let totalCouponIncomeAfterTax = 0;
+                let totalAmortizationAmount = 0;
                 let cumulativeInvested = initialInvestment;
-                let paymentCount = 0;
 
-                // Вычисляем дату начала амортизации
-                const totalDaysToMaturity = (maturityDate - couponDate) / (1000 * 60 * 60 * 24);
-                const estimatedPayments = Math.ceil(totalDaysToMaturity / couponPeriod);
-                const amortizationStartPayment = Math.max(0, estimatedPayments - amortizationStart);
+                // Генерируем все даты платежей (купоны и амортизация)
+                const paymentDates = new Map(); // дата -> {isCoupon, isAmort}
 
-                // Генерируем даты выплат купонов
-                let currentDate = new Date(couponDate);
-                let paymentNumber = 0;
-                
-                while (currentDate <= maturityDate) {
-                    // Выплата считается, если она происходит в день покупки или позже
-                    if (currentDate >= purchaseDate) {
-                        paymentNumber++;
-                        const couponBeforeTax = currentBonds * couponSize;
-                        const tax = couponBeforeTax * taxRate;
-                        const couponAfterTax = couponBeforeTax - tax;
-                        
-                        // Определяем размер амортизации
-                        let amortizationAmount = 0;
-                        if (paymentNumber > amortizationStartPayment) {
-                            amortizationAmount = nominal * amortizationRate * currentBonds;
+                // Добавляем даты купонов
+                let couponDateIter = new Date(couponDate);
+                while (couponDateIter <= maturityDate) {
+                    const timeKey = couponDateIter.getTime();
+                    if (!paymentDates.has(timeKey)) {
+                        paymentDates.set(timeKey, { isCoupon: false, isAmortization: false });
+                    }
+                    paymentDates.get(timeKey).isCoupon = true;
+                    couponDateIter = addDays(couponDateIter, couponPeriod);
+                }
+
+                // Добавляем даты амортизации
+                let amortizationDateIter = new Date(actualAmortizationStartDate);
+                while (amortizationDateIter <= maturityDate) {
+                    const timeKey = amortizationDateIter.getTime();
+                    if (!paymentDates.has(timeKey)) {
+                        paymentDates.set(timeKey, { isCoupon: false, isAmortization: false });
+                    }
+                    paymentDates.get(timeKey).isAmortization = true;
+                    amortizationDateIter = addDays(amortizationDateIter, amortizationPeriod);
+                }
+
+                // Сортируем даты
+                const sortedDates = Array.from(paymentDates.entries())
+                    .sort((a, b) => a[0] - b[0]);
+
+                // Обрабатываем каждую дату платежа
+                sortedDates.forEach(([timeKey, flags]) => {
+                    const paymentDate = new Date(timeKey);
+
+                    // Проверяем, что платеж происходит после или в день покупки
+                    if (paymentDate < purchaseDate) return;
+
+                    // Рассчитываем величины
+                    let couponBeforeTax = 0;
+                    let tax = 0;
+                    let couponAfterTax = 0;
+                    let amortizationAmount = 0;
+
+                    if (flags.isCoupon) {
+                        couponBeforeTax = currentBonds * couponSize;
+                        tax = couponBeforeTax * taxRate;
+                        couponAfterTax = couponBeforeTax - tax;
+                    }
+
+                    if (flags.isAmortization) {
+                        amortizationAmount = nominal * amortizationRate * currentBonds;
+                    }
+
+                    // Общая сумма для покупки
+                    const totalPurchaseFunds = couponAfterTax + monthlyPurchase + amortizationAmount;
+                    
+                    // Покупаем новые облигации
+                    const bondsPurchased = Math.floor(totalPurchaseFunds / priceInRubles);
+
+                    // Добавляем в результаты если есть какие-то платежи
+                    if (couponAfterTax > 0 || monthlyPurchase > 0 || amortizationAmount > 0) {
+                        let rowClass = '';
+                        if (flags.isCoupon && flags.isAmortization) {
+                            rowClass = 'both-row';
+                        } else if (flags.isAmortization) {
+                            rowClass = 'amort-row';
+                        } else if (flags.isCoupon) {
+                            rowClass = 'coupon-row';
                         }
 
-                        // Общая сумма для покупки
-                        const totalPurchaseFunds = couponAfterTax + monthlyPurchase + amortizationAmount;
-                        
-                        // Капитализация - покупаем новые облигации
-                        const bondsPurchased = Math.floor(totalPurchaseFunds / priceInRubles);
-                        
                         results.push({
-                            date: new Date(currentDate),
+                            date: new Date(paymentDate),
                             bondsBeforePayment: currentBonds,
                             couponBeforeTax: couponBeforeTax,
                             tax: tax,
@@ -481,22 +569,22 @@
                             amortizationAmount: amortizationAmount,
                             totalFunds: totalPurchaseFunds,
                             purchasePrice: priceInRubles,
-                            bondsPurchased: bondsPurchased
+                            bondsPurchased: bondsPurchased,
+                            rowClass: rowClass
                         });
 
                         currentBonds += bondsPurchased;
                         totalCouponIncomeAfterTax += couponAfterTax;
-                        cumulativeInvested += monthlyPurchase + amortizationAmount;
-                        paymentCount++;
+                        totalAmortizationAmount += amortizationAmount;
+                        
+                        if (monthlyPurchase > 0 || amortizationAmount > 0) {
+                            cumulativeInvested += monthlyPurchase + amortizationAmount;
+                        }
                     }
+                });
 
-                    // Переходим к следующей дате выплаты
-                    currentDate = new Date(currentDate.getTime() + couponPeriod * 24 * 60 * 60 * 1000);
-                }
-
-                // Если нет результатов, возвращаем ошибку
                 if (results.length === 0) {
-                    throw new Error('Нет выплат купонов между датой покупки и датой погашения. Пожалуйста, проверьте даты.');
+                    throw new Error('Нет выплат между датой покупки и датой погашения. Пожалуйста, проверьте даты.');
                 }
 
                 // Расчет прибыли при погашении
@@ -510,8 +598,8 @@
                 const totalIncome = totalCouponIncomeAfterTax + capitalGainAfterTax;
 
                 // Отображение результатов
-                displayResults(results, currentBonds, totalCouponIncomeAfterTax, capitalGainAfterTax, 
-                              totalIncome, totalAllInvestments, maturityValue);
+                displayResults(results, currentBonds, totalCouponIncomeAfterTax, totalAmortizationAmount,
+                              capitalGainAfterTax, totalIncome, totalAllInvestments, maturityValue);
 
                 document.getElementById('resultsSection').style.display = 'block';
                 document.getElementById('errorMessage').style.display = 'none';
@@ -525,26 +613,25 @@
             }
         }
 
-        function displayResults(results, finalBonds, totalCouponIncome, capitalGainAfterTax, 
-                               totalIncome, totalInvested, maturityValue) {
-            // Очищаем таблицу
+        function displayResults(results, finalBonds, totalCouponIncome, totalAmortization,
+                               capitalGainAfterTax, totalIncome, totalInvested, maturityValue) {
             const tableBody = document.getElementById('tableBody');
             tableBody.innerHTML = '';
 
-            // Заполняем таблицу результатами
-            results.forEach((row, index) => {
+            results.forEach((row) => {
                 const tr = document.createElement('tr');
+                tr.className = row.rowClass;
                 tr.innerHTML = `
                     <td><strong>${formatDate(row.date)}</strong></td>
                     <td>${formatNumber(row.bondsBeforePayment)}</td>
                     <td>${formatCurrency(row.couponBeforeTax)}</td>
                     <td>${formatCurrency(row.tax)}</td>
-                    <td style="background: #e8f5e9;"><strong>${formatCurrency(row.couponAfterTax)}</strong></td>
+                    <td>${formatCurrency(row.couponAfterTax)}</td>
                     <td>${formatCurrency(row.monthlyPurchase)}</td>
-                    <td style="background: #fff3e0;">${formatCurrency(row.amortizationAmount)}</td>
-                    <td style="background: #f3e5f5;"><strong>${formatCurrency(row.totalFunds)}</strong></td>
+                    <td>${formatCurrency(row.amortizationAmount)}</td>
+                    <td><strong>${formatCurrency(row.totalFunds)}</strong></td>
                     <td>${formatCurrency(row.purchasePrice)}</td>
-                    <td style="background: #e3f2fd;"><strong>${formatNumber(row.bondsPurchased)}</strong></td>
+                    <td><strong>${formatNumber(row.bondsPurchased)}</strong></td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -552,14 +639,14 @@
             // Обновляем сводку
             document.getElementById('finalBonds').textContent = formatNumber(finalBonds);
             document.getElementById('totalCouponIncome').textContent = formatCurrency(totalCouponIncome);
+            document.getElementById('totalAmortization').textContent = formatCurrency(totalAmortization);
             document.getElementById('revaluationProfit').textContent = formatCurrency(capitalGainAfterTax);
             document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
             document.getElementById('totalInvestment').textContent = formatCurrency(totalInvested);
             document.getElementById('finalValue').textContent = formatCurrency(maturityValue);
 
-            // Показываем сообщение об успехе
             const successEl = document.getElementById('successMessage');
-            successEl.textContent = `✅ Расчет выполнен успешно! Всего выплат купонов: ${results.length}`;
+            successEl.textContent = `✅ Расчет выполнен успешно! Всего платежей: ${results.length}`;
             successEl.style.display = 'block';
         }
     </script>
